@@ -3,17 +3,9 @@ import java.util.Scanner;
 
 public class Tienda {
 
-   private static final String URL = System.getenv("DB_URL") != null 
-        ? System.getenv("DB_URL") 
-        : "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-        
-    private static final String USER = System.getenv("DB_USER") != null 
-        ? System.getenv("DB_USER") 
-        : "root";
-        
-    private static final String PASSWORD = System.getenv("DB_PASSWORD") != null 
-        ? System.getenv("DB_PASSWORD") 
-        : "toor";
+    private static final String URL = "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String USER = "root";
+    private static final String PASSWORD = "toor";   
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;
