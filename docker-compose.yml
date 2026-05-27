@@ -34,21 +34,21 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      - DESCARGAS_USER=amigo1       # <-- Pon aquí el usuario que quieras
-      - DESCARGAS_PASSWORD=toor     # <-- Pon aquí la contraseña que quieras
+      - DESCARGAS_USER=amigo1       # <-- Tu usuario para la descarga
+      - DESCARGAS_PASSWORD=toor     # <-- Tu contraseña para la descarga
     volumes:
       - ./html:/usr/share/nginx/html
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./.htpasswd:/etc/nginx/.htpasswd
       - /etc/letsencrypt:/etc/letsencrypt
-    # Script automático: instala las utilidades de contraseñas, genera el archivo .htpasswd y arranca Nginx
+    # Comando corregido: escribe en /tmp/ donde no hay problemas de permisos en Nginx
     command: >
       /bin/sh -c "
       apt-get update && apt-get install -y apache2-utils &&
-      htpasswd -b -c /etc/nginx/.htpasswd $$DESCARGAS_USER $$DESCARGAS_PASSWORD &&
-      echo '=> Archivo .htpasswd generado automáticamente con éxito.' &&
+      htpasswd -b -c /tmp/.htpasswd $$DESCARGAS_USER $$DESCARGAS_PASSWORD &&
+      echo '=> Archivo .htpasswd generado con éxito en /tmp/.' &&
       nginx -g 'daemon off;'
       "
+
 # Volumen global para que los datos de MySQL no se pierdan al apagar los contenedores
 volumes:
   mysql_data:
