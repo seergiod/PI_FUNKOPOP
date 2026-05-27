@@ -75,11 +75,15 @@
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
         }
 
-        /* App Preview Section */
+        /* App Preview Section CORREGIDA Y CENTRADA */
         .preview-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             max-width: 1000px;
-            margin: 0 auto padding;
-            padding: 0 2rem 5rem 2rem;
+            margin: 0 auto; /* Centrado horizontal perfecto */
+            padding: 4rem 2rem 5rem 2rem;
+            width: 100%;
         }
 
         .section-title {
@@ -91,6 +95,7 @@
 
         /* Mockup de la Consola Java */
         .terminal-mockup {
+            width: 100%; /* Ocupa el ancho máximo del contenedor */
             background-color: #05070c;
             border: 1px solid #222f4d;
             border-radius: 12px;
@@ -140,6 +145,7 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             margin-top: 4rem;
+            width: 100%; /* Asegura que la cuadrícula use todo el ancho centrado */
         }
 
         .card {
