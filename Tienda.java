@@ -5,7 +5,7 @@ public class Tienda {
 
    private static final String URL = System.getenv("DB_URL") != null 
         ? System.getenv("DB_URL") 
-        : "jdbc:mysql://TU_IP_PUBLICA_DE_AWS:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        : "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         
     private static final String USER = System.getenv("DB_USER") != null 
         ? System.getenv("DB_USER") 
