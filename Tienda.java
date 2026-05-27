@@ -3,10 +3,9 @@ import java.util.Scanner;
 
 public class Tienda {
 
-    // Configuración dinámica para Docker o Local
-    private static final String URL = System.getenv("DB_URL") != null 
+   private static final String URL = System.getenv("DB_URL") != null 
         ? System.getenv("DB_URL") 
-        : "jdbc:mysql://localhost:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        : "jdbc:mysql://TU_IP_PUBLICA_DE_AWS:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         
     private static final String USER = System.getenv("DB_USER") != null 
         ? System.getenv("DB_USER") 
@@ -15,7 +14,6 @@ public class Tienda {
     private static final String PASSWORD = System.getenv("DB_PASSWORD") != null 
         ? System.getenv("DB_PASSWORD") 
         : "toor";
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;

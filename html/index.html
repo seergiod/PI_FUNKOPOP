@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FunkoPop Store - Gestión Oficial</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151d30;
+            --primary: #8b5cf6;
+            --primary-hover: #a78bfa;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #ec4899;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+
+        /* App Preview Section */
+        .preview-section {
+            max-width: 1000px;
+            margin: 0 auto padding;
+            padding: 0 2rem 5rem 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+
+        /* Mockup de la Consola Java */
+        .terminal-mockup {
+            background-color: #05070c;
+            border: 1px solid #222f4d;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background-color: #111625;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #222f4d;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .dot-red { background-color: #ef4444; }
+        .dot-yellow { background-color: #f59e0b; }
+        .dot-green { background-color: #10b981; }
+
+        .terminal-title {
+            margin-left: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .terminal-body {
+            padding: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            color: #10b981; /* Verde clásico de terminal */
+            font-size: 0.95rem;
+            background-color: #05070c;
+        }
+
+        .terminal-text-white { color: #f3f4f6; }
+        .terminal-text-blue { color: #3b82f6; }
+
+        /* Features Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid #222f4d;
+            padding: 2rem;
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid #111625;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <h1>PI_FunkopopStore</h1>
+        <p>Sistema centralizado en tiempo real para la gestión de inventario, control de clientes y procesamiento automatizado de pedidos de Funko Pops.</p>
+        <a href="/descargas" class="btn">Acceder al Área Privada</a>
+    </section>
+
+    <section class="preview-section">
+        <h2 class="section-title">Vista previa de la aplicación</h2>
+        
+        <div class="terminal-mockup">
+            <div class="terminal-header">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+                <span class="terminal-title">ubuntu@aws-ec2:~/PI_FUNKOPOP$ java -jar TiendaFunkos.jar</span>
+            </div>
+            <div class="terminal-body">
+                <p class="terminal-text-white">Conectando a AWS Relational Database Service...</p>
+                <p class="terminal-text-blue">¡Conexión establecida con éxito en puerto 3306!</p>
+                <br>
+                <p class="terminal-text-white">--- GESTIÓN TIENDA FUNKOS (SOLO BASE DE DATOS) ---</p>
+                <p>1. Listar Funkos (SELECT)</p>
+                <p>2. Insertar Funko (INSERT)</p>
+                <p>3. Listar Clientes (SELECT)</p>
+                <p>4. Registrar Cliente (INSERT)</p>
+                <p>5. Ver Historial Pedidos (SELECT)</p>
+                <p>6. Crear un Pedido (INSERT)</p>
+                <p>7. Eliminar un Cliente (DELETE)</p>
+                <p>8. Eliminar un Funko Pop (DELETE)</p>
+                <p>9. Salir del programa</p>
+                <br>
+                <p class="terminal-text-white">Selecciona una opción: <span style="animation: blink 1s infinite;">_</span></p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>⚡ Persistencia Total</h3>
+                <p>Operaciones CRUD directas mapeadas mediante JDBC nativo hacia el servidor MySQL de producción de manera inmediata.</p>
+            </div>
+            <div class="card">
+                <h3>🔒 Integridad de Datos</h3>
+                <p>Validaciones complejas contra duplicados de correos electrónicos, existencias de Funkos y eliminación segura en cascada.</p>
+            </div>
+            <div class="card">
+                <h3>🚀 Portable e Independiente</h3>
+                <p>Empaquetado robusto que incorpora el conector binario directamente para ejecutarse en cualquier sistema operativo en un clic.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 PI_FunkopopStore. Desarrollado como proyecto de Aplicaciones Web.
+    </footer>
+
+</body>
+</html>
