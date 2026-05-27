@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # 1. Contenedor de la Base de Datos
+  bbdd:
+    image: mysql:8.0
+    container_name: tienda_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: tienda_funkos
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  # 2. Contenedor de tu aplicación Java
+  java_app:
+    build: .
+    container_name: tienda_java
+    restart: always
+    depends_on:
+      - bbdd
+    environment:
+      - DB_URL=jdbc:mysql://bbdd:3306/tienda_funkos?useSSL=false&serverTimezone=UTC
+      - DB_USER=root
+      - DB_PASSWORD=toor
+    volumes:
+      - ./datos:/app/datos
+
+  # 3. Contenedor para la web HTML con tu Dominio
+  web_html:
+    image: nginx:alpine
+    container_name: tienda_web
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./html:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt:/etc/letsencrypt
