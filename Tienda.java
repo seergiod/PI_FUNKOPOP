@@ -1,14 +1,12 @@
-import java.io.*;
 import java.sql.*;
 import java.util.Scanner;
 
 public class Tienda {
 
-    // Datos de configuración de MySQL (Pon los tuyos si tienen contraseña)
     // Configuración dinámica para Docker o Local
     private static final String URL = System.getenv("DB_URL") != null 
         ? System.getenv("DB_URL") 
-        : "jdbc:mysql://localhost:3306/tienda_funkos?useSSL=false&serverTimezone=UTC";
+        : "jdbc:mysql://localhost:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         
     private static final String USER = System.getenv("DB_USER") != null 
         ? System.getenv("DB_USER") 
@@ -18,20 +16,12 @@ public class Tienda {
         ? System.getenv("DB_PASSWORD") 
         : "toor";
 
-    // Rutas de los ficheros TXT
-    private static final String FICHERO_CLIENTES = "datos/clientes.txt";
-    private static final String FICHERO_FUNKOS = "datos/funkos.txt";
-    private static final String FICHERO_PEDIDOS = "datos/pedidos.txt";
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
-        // 1. Al arrancar, leemos los TXT e insertamos en MySQL si no existen
-        cargarDatosDesdeFicheros();
-
         int opcion = 0;
+
         do {
-            System.out.println("\n--- GESTIÓN TIENDA FUNKOS (TODO EN MAIN) ---");
+            System.out.println("\n--- GESTIÓN TIENDA FUNKOS (SOLO BASE DE DATOS) ---");
             System.out.println("1. Listar Funkos (SELECT)");
             System.out.println("2. Insertar Funko (INSERT)");
             System.out.println("3. Listar Clientes (SELECT)");
@@ -39,7 +29,8 @@ public class Tienda {
             System.out.println("5. Ver Historial Pedidos (SELECT)");
             System.out.println("6. Crear un Pedido (INSERT)");
             System.out.println("7. Eliminar un Cliente (DELETE)");
-            System.out.println("8. Salir y Guardar en TXT");
+            System.out.println("8. Eliminar un Funko Pop (DELETE) *NUEVO*");
+            System.out.println("9. Salir del programa");
             System.out.print("Selecciona una opción: ");
 
             try {
@@ -86,14 +77,17 @@ public class Tienda {
                     eliminarCliente(idBorrar);
                     break;
                 case 8:
-                    System.out.println("Guardando cambios en los archivos TXT antes de salir...");
-                    guardarDatosAFicheros();
+                    System.out.print("ID del Funko a borrar: ");
+                    int idFunkoBorrar = Integer.parseInt(scanner.nextLine());
+                    eliminarFunkopop(idFunkoBorrar);
+                    break;
+                case 9:
                     System.out.println("¡Programa cerrado con éxito!");
                     break;
                 default:
                     System.out.println("Opción incorrecta.");
             }
-        } while (opcion != 8);
+        } while (opcion != 9);
 
         scanner.close();
     }
@@ -123,7 +117,8 @@ public class Tienda {
 
     private static void insertarFunko(FunkoPop f) {
         if (existeFunko(f.nombre, f.franquicia)) {
-            return; // Silencioso para la carga inicial
+            System.out.println("Ese Funko ya existe en la base de datos.");
+            return;
         }
         String sql = "INSERT INTO funkos (nombre, franquicia, precio, stock) VALUES (?, ?, ?, ?)";
         try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -164,7 +159,8 @@ public class Tienda {
 
     private static void insertarCliente(Cliente c) {
         if (existeEmail(c.email)) {
-            return; // Silencioso para la carga inicial
+            System.out.println("Un cliente con ese email ya está registrado.");
+            return;
         }
         String sql = "INSERT INTO clientes (nombre, email) VALUES (?, ?)";
         try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -201,8 +197,8 @@ public class Tienda {
     }
 
     private static void insertarPedido(Pedido p) {
-        // CORRECCIÓN CLAVE: Si ya existe este pedido idéntico en la BD, no lo duplicamos
         if (existePedido(p.idCliente, p.idFunko, p.cantidad, p.fecha)) {
+            System.out.println("Este pedido exacto ya está registrado.");
             return; 
         }
         String sql = "INSERT INTO pedidos (id_cliente, id_funko, cantidad, fecha) VALUES (?, ?, ?, ?)";
@@ -218,7 +214,6 @@ public class Tienda {
         }
     }
 
-    // NUEVO MÉTODO COMPROBACIÓN: Evita que los pedidos se dupliquen al leer el TXT
     private static boolean existePedido(int idCliente, int idFunko, int cantidad, Date fecha) {
         String sql = "SELECT COUNT(*) FROM pedidos WHERE id_cliente = ? AND id_funko = ? AND cantidad = ? AND fecha = ?";
         try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -238,85 +233,22 @@ public class Tienda {
         try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             int filas = ps.executeUpdate();
-            if (filas > 0) System.out.println("Cliente eliminado.");
-            else System.out.println("No se encontró ese ID.");
+            if (filas > 0) System.out.println("Cliente eliminado correctamente.");
+            else System.out.println("No se encontró ningún cliente con ese ID.");
         } catch (SQLException e) {
             System.out.println("Error al eliminar cliente: " + e.getMessage());
         }
     }
 
-    // ==========================================
-    // MÉTODOS DE PERSISTENCIA (FICHEROS TXT)
-    // ==========================================
-
-    private static void cargarDatosDesdeFicheros() {
-        System.out.println("[Sincronizando Ficheros -> Base de Datos...]");
-
-        // Cargar Clientes
-        try (BufferedReader br = new BufferedReader(new FileReader(FICHERO_CLIENTES))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                if (linea.trim().isEmpty()) continue;
-                String[] datos = linea.split(";");
-                insertarCliente(new Cliente(datos[0], datos[1]));
-            }
-        } catch (IOException e) { System.out.println("No se encontró clientes.txt, se creará al salir."); }
-
-        // Cargar Funkos
-        try (BufferedReader br = new BufferedReader(new FileReader(FICHERO_FUNKOS))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                if (linea.trim().isEmpty()) continue;
-                String[] datos = linea.split(";");
-                insertarFunko(new FunkoPop(datos[0], datos[1], Double.parseDouble(datos[2]), Integer.parseInt(datos[3])));
-            }
-        } catch (IOException e) { System.out.println("No se encontró funkos.txt, se creará al salir."); }
-
-        // Cargar Pedidos
-        try (BufferedReader br = new BufferedReader(new FileReader(FICHERO_PEDIDOS))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                if (linea.trim().isEmpty()) continue;
-                String[] datos = linea.split(";");
-                // Leemos los datos del TXT (idCliente, idFunko, cantidad, fecha)
-                insertarPedido(new Pedido(Integer.parseInt(datos[0]), Integer.parseInt(datos[1]), Integer.parseInt(datos[2]), Date.valueOf(datos[3])));
-            }
-        } catch (IOException e) { System.out.println("No se encontró pedidos.txt, se creará al salir."); }
-    }
-
-    private static void guardarDatosAFicheros() {
-        File carpeta = new File("datos");
-        if (!carpeta.exists()) carpeta.mkdir();
-
-        // Volcar Clientes
-        try (PrintWriter pw = new PrintWriter(new FileWriter(FICHERO_CLIENTES))) {
-            String sql = "SELECT * FROM clientes";
-            try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    pw.println(rs.getString("nombre") + ";" + rs.getString("email"));
-                }
-            }
-        } catch (Exception e) { System.out.println("Error guardando clientes.txt"); }
-
-        // Volcar Funkos
-        try (PrintWriter pw = new PrintWriter(new FileWriter(FICHERO_FUNKOS))) {
-            String sql = "SELECT * FROM funkos";
-            try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    pw.println(rs.getString("nombre") + ";" + rs.getString("franquicia") + ";" + rs.getDouble("precio") + ";" + rs.getInt("stock"));
-                }
-            }
-        } catch (Exception e) { System.out.println("Error guardando funkos.txt"); }
-
-        // Volcar Pedidos
-        try (PrintWriter pw = new PrintWriter(new FileWriter(FICHERO_PEDIDOS))) {
-            String sql = "SELECT * FROM pedidos";
-            try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    // Guardamos los datos de relación en el archivo
-                    pw.println(rs.getInt("id_cliente") + ";" + rs.getInt("id_funko") + ";" + rs.getInt("cantidad") + ";" + rs.getDate("fecha"));
-                }
-            }
-        } catch (Exception e) { System.out.println("Error guardando pedidos.txt"); }
+    private static void eliminarFunkopop(int id) {
+        String sql = "DELETE FROM funkos WHERE id = ?";
+        try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            int filas = ps.executeUpdate();
+            if (filas > 0) System.out.println("Funko Pop eliminado correctamente.");
+            else System.out.println("No se encontró ningún Funko Pop con ese ID.");
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar Funko: " + e.getMessage());
+        }
     }
 }

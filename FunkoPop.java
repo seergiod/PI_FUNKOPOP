@@ -1,5 +1,10 @@
 public class FunkoPop {
     public int id;
+    
+    public int getId() {
+        return id;
+    }
+
     public String nombre;
     public String franquicia;
     public double precio;
