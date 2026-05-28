@@ -3,12 +3,38 @@ import java.util.Scanner;
 
 public class Tienda {
 
-   private static final String URL_LOCAL = "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static String urlEfectiva;
+    private static String usuarioEfectivo;
+    private static String passwordEfectivo;
+
+    static {
+        // Si existe la variable de Docker, manda el entorno de contenedores
+        if (System.getenv("DB_URL") != null) {
+            urlEfectiva = System.getenv("DB_URL");
+            usuarioEfectivo = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "root";
+            passwordEfectivo = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "toor";
+        } else {
+            // Si estamos fuera de Docker (Host de la EC2 o PC local)
+            usuarioEfectivo = "root";
+            passwordEfectivo = "toor";
+            
+            String urlEC2Host = "jdbc:mysql://127.0.0.1:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+            String urlCasaPC = "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+            
+            // Hacemos un intento rápido a localhost para saber si estamos ejecutando en la terminal de la EC2
+            try {
+                DriverManager.setLoginTimeout(2); 
+                try (Connection con = DriverManager.getConnection(urlEC2Host, usuarioEfectivo, passwordEfectivo)) {
+                    urlEfectiva = urlEC2Host;
+                }
+            } catch (Exception e) {
+                // Si falla localhost, es que estás ejecutando el código desde tu casa apuntando a AWS
+                urlEfectiva = urlCasaPC;
+            }
+            DriverManager.setLoginTimeout(0); 
+        }
+    }
     
-    // Lógica inteligente: Si existe variable de Docker (DB_URL) la usa, si no, usa la de tu casa (URL_LOCAL)
-    private static final String URL = System.getenv("DB_URL") != null ? System.getenv("DB_URL") : URL_LOCAL;
-    private static final String USER = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "root";
-    private static final String PASSWORD = System.getenv("DB_PASS") != null ? System.getenv("DB_PASS") : "toor";   
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;
@@ -85,16 +111,9 @@ public class Tienda {
         scanner.close();
     }
 
-    // ==========================================
-    // MÉTODO DE CONEXIÓN A LA BASE DE DATOS
-    // ==========================================
     private static Connection conectar() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        return DriverManager.getConnection(urlEfectiva, usuarioEfectivo, passwordEfectivo);
     }
-
-    // ==========================================
-    // MÉTODOS DE LA BASE DE DATOS (JDBC)
-    // ==========================================
 
     private static void listarFunkos() {
         String sql = "SELECT * FROM funkos";
