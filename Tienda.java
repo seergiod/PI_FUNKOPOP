@@ -3,39 +3,19 @@ import java.util.Scanner;
 
 public class Tienda {
 
-    private static String urlEfectiva;
-    private static String usuarioEfectivo;
-    private static String passwordEfectivo;
-
-    // Bloque estático inteligente multientorno sin fallos de red
-    static {
-        if (System.getenv("DB_URL") != null) {
-            // ENTORNO 1: Dentro del contenedor Docker
-            urlEfectiva = System.getenv("DB_URL").replace("\"", "");
-            usuarioEfectivo = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "root";
-            passwordEfectivo = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "toor";
-        } else {
-            // ENTORNO 2 y 3: Fuera de Docker (Tu casa o la terminal de la EC2)
-            usuarioEfectivo = "root";
-            passwordEfectivo = "toor";
-            
-            String urlLocalhost = "jdbc:mysql://127.0.0.1:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-            String urlDominio = "jdbc:mysql://poppai.yatat.es:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-            
-            // Intentamos conectar primero a localhost (por si ejecutas nativo en la EC2)
-            try {
-                DriverManager.setLoginTimeout(1); // Timeout rápido de 1 segundo
-                try (Connection con = DriverManager.getConnection(urlLocalhost, usuarioEfectivo, passwordEfectivo)) {
-                    urlEfectiva = urlLocalhost;
-                }
-            } catch (Exception e) {
-                // Si falla localhost, es que estás en tu casa o es un amigo con el .jar externo
-                urlEfectiva = urlDominio;
-            }
-            DriverManager.setLoginTimeout(0); // Restauramos el timeout por defecto
-        }
+   static {
+    if (System.getenv("DB_URL") != null) {
+        // Entorno Docker (contenedor java_app)
+        urlEfectiva = System.getenv("DB_URL").replace("\"", "");
+        usuarioEfectivo = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "root";
+        passwordEfectivo = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "toor";
+    } else {
+        // Cualquier usuario que descargue el .jar
+        urlEfectiva = "jdbc:mysql://poppai.yatat.es:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        usuarioEfectivo = "root";
+        passwordEfectivo = "toor";
     }
-    
+}
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;
@@ -116,7 +96,7 @@ public class Tienda {
     // MÉTODO DE CONEXIÓN A LA BASE DE DATOS
     // ==========================================
     private static Connection conectar() throws SQLException {
-        return DriverManager.getConnection(urlEfectiva, usuarioEfectivo, passwordEfectivo);
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
     // ==========================================

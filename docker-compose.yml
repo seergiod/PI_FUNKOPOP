@@ -18,12 +18,12 @@ services:
     build: .
     container_name: tienda_java
     restart: always
-    tty: true           # Mantiene el canal de texto abierto
+    tty: true           # Permite interactuar con la consola del contenedor
     stdin_open: true    # Mantiene el teclado abierto para el Scanner
     depends_on:
       - bbdd
     environment:
-      - DB_URL=jdbc:mysql://bbdd:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - DB_URL="jdbc:mysql://bbdd:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
       - DB_USER=root
       - DB_PASSWORD=toor
 
@@ -61,7 +61,6 @@ services:
       - certbot_www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet && docker kill -s HUP tienda_web; sleep 12h & wait $${!}; done'"
 
-# Volúmenes compartidos globales
 volumes:
   mysql_data:
   certbot_certs:
