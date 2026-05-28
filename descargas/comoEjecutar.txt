@@ -1,0 +1,4 @@
+DB_URL="jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" java -jar pi_Funkopop.jar
+
+
+
