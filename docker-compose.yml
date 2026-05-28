@@ -23,7 +23,7 @@ services:
     depends_on:
       - bbdd
     environment:
-      - "DB_URL=jdbc:mysql://bbdd:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      - DB_URL="jdbc:mysql://bbdd:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
       - DB_USER=root
       - DB_PASSWORD=toor
 
