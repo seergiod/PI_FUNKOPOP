@@ -3,9 +3,12 @@ import java.util.Scanner;
 
 public class Tienda {
 
-    private static final String URL = "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String USER = "root";
-    private static final String PASSWORD = "toor";   
+   private static final String URL_LOCAL = "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    
+    // Lógica inteligente: Si existe variable de Docker (DB_URL) la usa, si no, usa la de tu casa (URL_LOCAL)
+    private static final String URL = System.getenv("DB_URL") != null ? System.getenv("DB_URL") : URL_LOCAL;
+    private static final String USER = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "root";
+    private static final String PASSWORD = System.getenv("DB_PASS") != null ? System.getenv("DB_PASS") : "toor";   
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;
