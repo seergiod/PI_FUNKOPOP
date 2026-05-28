@@ -7,31 +7,32 @@ public class Tienda {
     private static String usuarioEfectivo;
     private static String passwordEfectivo;
 
+    // Bloque estático inteligente multientorno sin fallos de red
     static {
-        // Si existe la variable de Docker, manda el entorno de contenedores
         if (System.getenv("DB_URL") != null) {
-            urlEfectiva = System.getenv("DB_URL");
+            // ENTORNO 1: Dentro del contenedor Docker
+            urlEfectiva = System.getenv("DB_URL").replace("\"", "");
             usuarioEfectivo = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "root";
             passwordEfectivo = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "toor";
         } else {
-            // Si estamos fuera de Docker (Host de la EC2 o PC local)
+            // ENTORNO 2 y 3: Fuera de Docker (Tu casa o la terminal de la EC2)
             usuarioEfectivo = "root";
             passwordEfectivo = "toor";
             
-            String urlEC2Host = "jdbc:mysql://127.0.0.1:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-            String urlCasaPC = "jdbc:mysql://35.175.55.211:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+            String urlLocalhost = "jdbc:mysql://127.0.0.1:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+            String urlDominio = "jdbc:mysql://poppai.yatat.es:3306/tienda_funkos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
             
-            // Hacemos un intento rápido a localhost para saber si estamos ejecutando en la terminal de la EC2
+            // Intentamos conectar primero a localhost (por si ejecutas nativo en la EC2)
             try {
-                DriverManager.setLoginTimeout(2); 
-                try (Connection con = DriverManager.getConnection(urlEC2Host, usuarioEfectivo, passwordEfectivo)) {
-                    urlEfectiva = urlEC2Host;
+                DriverManager.setLoginTimeout(1); // Timeout rápido de 1 segundo
+                try (Connection con = DriverManager.getConnection(urlLocalhost, usuarioEfectivo, passwordEfectivo)) {
+                    urlEfectiva = urlLocalhost;
                 }
             } catch (Exception e) {
-                // Si falla localhost, es que estás ejecutando el código desde tu casa apuntando a AWS
-                urlEfectiva = urlCasaPC;
+                // Si falla localhost, es que estás en tu casa o es un amigo con el .jar externo
+                urlEfectiva = urlDominio;
             }
-            DriverManager.setLoginTimeout(0); 
+            DriverManager.setLoginTimeout(0); // Restauramos el timeout por defecto
         }
     }
     
@@ -111,9 +112,16 @@ public class Tienda {
         scanner.close();
     }
 
+    // ==========================================
+    // MÉTODO DE CONEXIÓN A LA BASE DE DATOS
+    // ==========================================
     private static Connection conectar() throws SQLException {
         return DriverManager.getConnection(urlEfectiva, usuarioEfectivo, passwordEfectivo);
     }
+
+    // ==========================================
+    // MÉTODOS DE LA BASE DE DATOS (JDBC)
+    // ==========================================
 
     private static void listarFunkos() {
         String sql = "SELECT * FROM funkos";
