@@ -1,7 +1,7 @@
 public class Cliente {
-    public int id;
-    public String nombre;
-    public String email;
+    private int id;
+    private String nombre;
+    private String email;
 
     public Cliente(String nombre, String email) {
         this.nombre = nombre;
@@ -17,5 +17,17 @@ public class Cliente {
     @Override
     public String toString() {
         return "ID: " + id + " | Nombre: " + nombre + " | Email: " + email;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

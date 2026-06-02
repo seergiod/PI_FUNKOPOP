@@ -3,7 +3,12 @@ import java.util.Scanner;
 
 public class Tienda {
 
+    private static String urlEfectiva;
+    private static String usuarioEfectivo;
+    private static String passwordEfectivo;
+
    static {
+    
     if (System.getenv("DB_URL") != null) {
         // Entorno Docker (contenedor java_app)
         urlEfectiva = System.getenv("DB_URL").replace("\"", "");
@@ -96,7 +101,7 @@ public class Tienda {
     // MÉTODO DE CONEXIÓN A LA BASE DE DATOS
     // ==========================================
     private static Connection conectar() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        return DriverManager.getConnection(urlEfectiva, usuarioEfectivo, passwordEfectivo);
     }
 
     // ==========================================
@@ -116,18 +121,18 @@ public class Tienda {
     }
 
     private static void insertarFunko(FunkoPop f) {
-        if (existeFunko(f.nombre, f.franquicia)) {
+        if (existeFunko(f.getNombre(), f.getFranquicia())) {
             System.out.println("Ese Funko ya existe en la base de datos.");
             return;
         }
         String sql = "INSERT INTO funkos (nombre, franquicia, precio, stock) VALUES (?, ?, ?, ?)";
         try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, f.nombre);
-            ps.setString(2, f.franquicia);
-            ps.setDouble(3, f.precio);
-            ps.setInt(4, f.stock);
+            ps.setString(1, f.getNombre());
+            ps.setString(2, f.getFranquicia());
+            ps.setDouble(3, f.getPrecio());
+            ps.setInt(4, f.getStock());
             ps.executeUpdate();
-            System.out.println("¡Funko guardado!: " + f.nombre);
+            System.out.println("¡Funko guardado!: " + f.getNombre());
         } catch (SQLException e) {
             System.out.println("Error al insertar funko: " + e.getMessage());
         }
@@ -158,16 +163,16 @@ public class Tienda {
     }
 
     private static void insertarCliente(Cliente c) {
-        if (existeEmail(c.email)) {
+        if (existeEmail(c.getEmail())) {
             System.out.println("Un cliente con ese email ya está registrado.");
             return;
         }
         String sql = "INSERT INTO clientes (nombre, email) VALUES (?, ?)";
         try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, c.nombre);
-            ps.setString(2, c.email);
+            ps.setString(1, c.getNombre());
+            ps.setString(2, c.getEmail());
             ps.executeUpdate();
-            System.out.println("¡Cliente registrado!: " + c.nombre);
+            System.out.println("¡Cliente registrado!: " + c.getNombre());
         } catch (SQLException e) {
             System.out.println("Error al insertar cliente: " + e.getMessage());
         }
@@ -197,16 +202,16 @@ public class Tienda {
     }
 
     private static void insertarPedido(Pedido p) {
-        if (existePedido(p.idCliente, p.idFunko, p.cantidad, p.fecha)) {
+        if (existePedido(p.getIdCliente(), p.getIdFunko(), p.getCantidad(), p.getFecha())) {
             System.out.println("Este pedido exacto ya está registrado.");
             return; 
         }
         String sql = "INSERT INTO pedidos (id_cliente, id_funko, cantidad, fecha) VALUES (?, ?, ?, ?)";
         try (Connection con = conectar(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, p.idCliente);
-            ps.setInt(2, p.idFunko);
-            ps.setInt(3, p.cantidad);
-            ps.setDate(4, p.fecha);
+            ps.setInt(1, p.getIdCliente());
+            ps.setInt(2, p.getIdFunko());
+            ps.setInt(3, p.getCantidad());
+            ps.setDate(4, p.getFecha());
             ps.executeUpdate();
             System.out.println("¡Pedido registrado correctamente!");
         } catch (SQLException e) {
