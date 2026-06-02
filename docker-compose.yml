@@ -36,7 +36,7 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      - DESCARGAS_USER=amigo1
+      - DESCARGAS_USER=user
       - DESCARGAS_PASSWORD=toor
     volumes:
       - ./html:/usr/share/nginx/html
